@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./style.css">
+    <title>Document</title>
+</head>
+<body>
+    <div class="container">
+        <img class="logo" src="img/logo.svg" alt="Food Bill">
+         <div class="header"> 
+            <ul class="head">
+                <a href="/">home</a>
+                <a class="pay" href="/pay">pay ...$</a>
+            </ul>
+        </div>
+        <div class="box"></div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+          let cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+          const boxElement = document.querySelector('.box');
+          const payElement = document.querySelector('.pay');
+
+          let totalSum = 0; // Variable to store the total sum
+
+          cartItems.forEach((item, index) => {
+            const productDiv = document.createElement('div');
+            productDiv.classList.add('product-box');
+            productDiv.innerHTML = `
+                <img src="${item.image}" alt="${item.title}">
+                <div class="div_text_cart">
+                    <h3>${item.title}</h3>
+                    <p>${item.price}</p>
+                </div>
+                <button class="delete" data-index="${index}">+</button>
+            `;
+            boxElement.appendChild(productDiv);
+
+            totalSum += parseFloat(item.price.replace('$', ''));
+          });
+
+          payElement.textContent = `Pay: ${totalSum.toFixed(2)}$`;
+
+          const deleteButtons = document.querySelectorAll('.delete');
+          deleteButtons.forEach(button => {
+            button.addEventListener('click', () => {
+              const indexToRemove = parseInt(button.getAttribute('data-index'));
+              cartItems.splice(indexToRemove, 1);
+
+              localStorage.setItem('cartItems', JSON.stringify(cartItems));
+
+              const productDiv = button.closest('.product-box');
+              productDiv.remove();
+
+              totalSum = cartItems.reduce((sum, item) => sum + parseFloat(item.price.replace('$', '')), 0);
+              payElement.textContent = `Pay: ${totalSum.toFixed(2)}$`;
+            });
+          });
+        });
+    </script>
+</body>
+</html>
